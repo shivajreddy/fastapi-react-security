@@ -40,3 +40,9 @@ async def app_init():
 @app.get("/api/healthchecker")
 def root():
     return {"message": "Hello World"}
+
+
+# TODO: delete these later
+@app.get("/data")
+def test_data():
+    return {"some": "data"}
