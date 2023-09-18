@@ -26,6 +26,11 @@ class NewUserSchema(BaseModel):
     verified: bool = False
 
 
+class LoginResponse(BaseModel):
+    user: User
+    access_token: str
+
+
 class RefreshTokenData(BaseModel):
     username: str
     created_at: str

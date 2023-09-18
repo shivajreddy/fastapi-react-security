@@ -11,7 +11,7 @@ from app.oauth2 import create_access_token, create_refresh_token, verify_refresh
 from app.schema import User, NewUserSchema
 from app.utils import hash_password, verify_password
 
-router = APIRouter()
+router = APIRouter(prefix="/auth")
 
 
 # Register a new user
@@ -55,10 +55,26 @@ async def create_user(payload: NewUserSchema):
     )
 
     # create a ppty in the document to save the secret key
+    """
+          // export interface ISecurityState {
+      //   user?: IUser;
+      //   accessToken?: string;
+      //   lastLogin?: Date;
+      // }
 
-    response = JSONResponse(
-        content={"access_token": access_token, "token_type": "Bearer"}
-    )
+
+      // export interface IUser {
+      //   username: string;
+      //   department: string;
+      //   team: string;
+      //   role: string;
+      // }
+    """
+    response = JSONResponse(content={
+        "access_token": access_token,
+        "token_type": "Bearer",
+    })
+
     response.set_cookie(
         key="refresh_token", value=refresh_token, httponly=True, max_age=86400
     )
@@ -103,9 +119,14 @@ async def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()])
     user_coll.update_one(user_doc, {"$set": {"refresh_token": refresh_token}})
 
     # store refresh and access token in cookie
-    response = JSONResponse(
-        content={"status": "success", "access_token": access_token, "roles": user.roles}
-    )
+    response = JSONResponse(content={
+        "status": "success",
+        "access_token": access_token,
+        "roles": user.roles,
+        "username":  user.username,
+        "department": "",
+        "team": "",
+        })
     response.set_cookie("refresh_token", refresh_token, httponly=True, max_age=86400)
     return response
 
